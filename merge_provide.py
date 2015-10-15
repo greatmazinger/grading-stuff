@@ -2,10 +2,15 @@ import os
 import re
 import pprint
 from shutil import copy2
+import argparse
 
+# Merge submissions from the Tufts provide system.
+# Author: Raoul Veroy
+#
 pp = pprint.PrettyPrinter(indent = 4)
 
 def verify_users(summary = {}):
+    # TODO: This needs documenting.
     global pp
     problist = summary.keys()
     users = {}
@@ -23,9 +28,16 @@ def verify_users(summary = {}):
                 missing[prob2] = users[prob1] - users[prob2]
     return missing
 
-hw = "hw3"
-myre = re.compile("hw3p(.)")
+parser = argparse.ArgumentParser()
+parser.add_argument( "HWname",
+                     help = "Assignmane name (eg. HW8)" )
+
+args = parser.parse_args()
+hw = args.HWname
+
+myre = re.compile("%sp(.)" % hw)
 dir_re = re.compile("(.*)\.([0-9]+)$")
+exit(100)
 summary = {}
 for item in os.listdir("."):
     m = myre.match(item)
