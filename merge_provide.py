@@ -9,7 +9,9 @@ import argparse
 #
 pp = pprint.PrettyPrinter(indent = 4)
 
-def verify_users(summary = {}):
+problist = range(1,6)
+
+def _OLD_verify_users(summary = {}):
     # TODO: This needs documenting.
     global pp
     problist = summary.keys()
@@ -28,6 +30,27 @@ def verify_users(summary = {}):
                 missing[prob2] = users[prob1] - users[prob2]
     return missing
 
+def verify_users(summary = {}):
+    global pp
+    global problist
+    users = {}
+    for prob in problist:
+        users[prob] = list(set( summary[prob].keys() ))
+    missing = dict( [ (prob, set([])) for prob in problist ] )
+    # Get all users that submitted at least 1 pdf.
+    print "------------------------------"
+    userlist = []
+    for x in users.itervalues():
+        userlist.extend(x)
+    userlist = set(userlist)
+    pp.pprint(userlist)
+    print "------------------------------"
+    for user in userlist:
+        for problem in problist:
+            if user not in users[problem]:
+                missing[problem].add( user )
+    return missing
+
 parser = argparse.ArgumentParser()
 parser.add_argument( "HWname",
                      help = "Assignmane name (eg. HW8)" )
@@ -37,7 +60,6 @@ hw = args.HWname
 
 myre = re.compile("%sp(.)" % hw)
 dir_re = re.compile("(.*)\.([0-9]+)$")
-exit(100)
 summary = {}
 for item in os.listdir("."):
     m = myre.match(item)
@@ -80,7 +102,8 @@ pp.pprint(missing)
 for prob, mset in missing.iteritems():
     if len(mset) > 0:
         print "WARNING missing from problem %d:" % prob
-        pprint(list(mset))
+        pp.pprint(list(mset))
+        raw_input("Please enter to continue:")
 print "#######[ MERGING ]##############################################################"
 print "Current directory: %s" % os.getcwd()
 print "Making directory MERGED..."
